@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // Целевая версия JavaScript
+    "lib": ["dom", "dom.iterable", "esnext"], // Библиотеки, которые TS "знает"
+    "module": "ESNext", // Система модулей
+    "moduleResolution": "node",
+    "jsx": "react-jsx", // Используем современный JSX-трансформер React 17+
+    "strict": true, // Включаем строгий режим
+    "esModuleInterop": true, // Для совместимости с CommonJS модулями
+    "skipLibCheck": true, // Пропускаем проверку типов в .d.ts файлах
+    "allowSyntheticDefaultImports": true, // Разрешаем default импорты
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "src" 
+  ]
+}

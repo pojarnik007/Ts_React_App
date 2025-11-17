@@ -1,0 +1,13 @@
+
+#rec_list{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+#page{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
