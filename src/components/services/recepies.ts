@@ -7,7 +7,7 @@ export const recipesApi = createApi({
   endpoints: (builder) => ({
     
     getAllRecipes: builder.query<IRecipesResponse, void>({
-      query: () => 'recipes',
+      query: () => 'recipes?limit=0',
     }),
 
     searchRecipes: builder.query<IRecipesResponse, string>({

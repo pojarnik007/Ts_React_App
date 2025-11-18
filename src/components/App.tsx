@@ -6,6 +6,7 @@ import { Counter } from './features/counter/counter';
 import '../styles.css'
 import Navigation from './features/nac';
 import HomePage from './pages/recepiesPage';
+import RecipePage from './pages/receiptPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/count" element={<Counter />} />
           <Route path="/receipts" element={<HomePage />} />
+          <Route path="/recipe/:id" element={<RecipePage />} />
       </Routes>
     </div>
   );
