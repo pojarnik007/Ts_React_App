@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   Container, Grid, Card, CardMedia, CardContent, Typography, CardActions, Button, 
   Chip, CircularProgress, Box, TextField, FormControl, InputLabel, Select, MenuItem, 
   InputAdornment, Paper 
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { useGetAllRecipesQuery } from '../services/recepies';
 
 
@@ -48,7 +47,7 @@ const RecepiesPage = () => {
         Рецепты
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 4, backgroundColor: '#f5f5f5' }} elevation={1}>
+      <Paper sx={{ p: 3, mb: 4, backgroundColor: '#fafafaff' }} elevation={1}>
         <Grid container spacing={2} alignItems="center">
 
           <Grid size={{ xs: 12, md: 6 }}>
@@ -58,13 +57,6 @@ const RecepiesPage = () => {
               variant="outlined"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </Grid>
 
@@ -119,14 +111,14 @@ const RecepiesPage = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" component={RouterLink} to={`/recipe/${recipe.id}`}>Подробнее</Button>
+                  <Button size="small" component={Link} to={`/recipe/${recipe.id}`}>Подробнее</Button>
                 </CardActions>
               </Card>
             </Grid>
           ))
         ) : (
           <Typography variant="h6" sx={{ mt: 4, width: '100%', textAlign: 'center' }}>
-            Рецепты не найдены 😔
+            Рецепты не найдены
           </Typography>
         )}
       </Grid>

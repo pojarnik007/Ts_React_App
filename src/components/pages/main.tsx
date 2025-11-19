@@ -1,5 +1,5 @@
 import React from 'react';
-import './recepies.css'
+import './css/recepies.css'
 
 const MainPage: React.FC = () => {
 

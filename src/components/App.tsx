@@ -2,22 +2,24 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainPage from './pages/main';
-import { Counter } from './features/counter/counter';
 import '../styles.css'
-import Navigation from './features/nac';
+import Navigation from './features/nav';
 import HomePage from './pages/recepiesPage';
 import RecipePage from './pages/receiptPage';
+import Layout from './features/layout';
 
 function App() {
   return (
     <div id='cont'>
-      <Navigation />
       <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/count" element={<Counter />} />
-          <Route path="/receipts" element={<HomePage />} />
+        <Route element={<Layout />}>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/receipts" element={<HomePage />} />
+        </Route>
+          {/* <Route path="/login" element={<LoginPage />} /> */}
           <Route path="/recipe/:id" element={<RecipePage />} />
       </Routes>
+      <Navigation />
     </div>
   );
 }

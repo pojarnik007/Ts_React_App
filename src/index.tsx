@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './components/App';
 import { Provider } from 'react-redux';
 import { store } from './components/store/store';
+import { CssBaseline } from '@mui/material';
 
 const container = document.getElementById('root');
 if (container) {
@@ -12,6 +13,7 @@ if (container) {
   root.render(
     <Provider store={store}>
       <BrowserRouter>
+        <CssBaseline />
         <App/>
       </BrowserRouter>
     </Provider>

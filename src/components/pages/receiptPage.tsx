@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { 
   Container, Box, Typography, CircularProgress, Button, Grid, Chip, Paper, 
   List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox 
@@ -7,29 +7,30 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { useGetRecipeByIdQuery } from '../services/recepies';
+import "./css/receiptpage.css"
 
 const RecipePage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: recipe, isLoading } = useGetRecipeByIdQuery(id || '', { skip: !id });
 
   if (isLoading) {
-    return <Box display="flex" justifyContent="center" mt={10}><CircularProgress /></Box>;
+    return <Box id = "loader"><CircularProgress /></Box>;
   }
 
   if (!recipe) {
-    return <Typography variant="h5" align="center" mt={10}>Рецепт не найден</Typography>;
+    return <Typography id = "error_message" variant="h5" align="center" mt={10}>Рецепт не найден</Typography>;
   }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Button component={RouterLink} to="/receipts" startIcon={<ArrowBackIcon />} sx={{ mb: 3 }}>
+      <Button component={Link} to="/receipts" startIcon={<ArrowBackIcon />} sx={{ mb: 3 }}>
         Назад к списку
       </Button>
 
       <Grid container spacing={4}>
         <Grid size={{xs: 12 ,md: 5}}>
           <Paper elevation={3} sx={{ overflow: 'hidden', borderRadius: 2 }}>
-            <img src={recipe.image} alt={recipe.name} style={{ width: '100%', height: 'auto', display: 'block' }} />
+            <img id='Receipt_Image' src={recipe.image} alt={recipe.name}/>
           </Paper>
           
           <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -72,7 +73,7 @@ const RecipePage = () => {
           </Typography>
           <Box component="ol" sx={{ pl: 2 }}>
             {recipe.instructions.map((step, index) => (
-              <li key={index} style={{ marginBottom: '10px', paddingLeft: '10px' }}>
+              <li id='Receipt_step' key={index}>
                 <Typography variant="body1">{step}</Typography>
               </li>
             ))}
