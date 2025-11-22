@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { store } from './components/store/store';
 import { CssBaseline } from '@mui/material';
 
+
 const container = document.getElementById('root');
 if (container) {
   const root = createRoot(container);
