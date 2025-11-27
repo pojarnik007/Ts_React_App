@@ -1,11 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import './styles.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import App from './components/App';
+import App from './App';
 import { Provider } from 'react-redux';
-import { store } from './components/store/store';
-import { CssBaseline } from '@mui/material';
+import { store } from './store/store';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+
+const theme = createTheme();
 
 
 const container = document.getElementById('root');
@@ -15,7 +16,9 @@ if (container) {
     <Provider store={store}>
       <BrowserRouter>
         <CssBaseline />
-        <App/>
+        <ThemeProvider theme={theme}> 
+      <App />
+    </ThemeProvider>
       </BrowserRouter>
     </Provider>
   );
