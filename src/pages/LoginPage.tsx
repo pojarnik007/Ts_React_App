@@ -27,7 +27,7 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     try {
       const user = await loginRequest(data).unwrap();
-      dispatch(login(user.token));
+      dispatch(login(user.accessToken));
       navigate("/", { replace: true })
     } catch {
       alert("Неверный логин или пароль");

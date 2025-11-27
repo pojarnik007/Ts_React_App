@@ -1,16 +1,16 @@
 import { Outlet } from 'react-router-dom';
+import { useMediaQuery, useTheme } from '@mui/material';
 import Navigation from './nav';
-import '../../styles.css'
 
 const Layout = () => {
   return (
     <>
+      <Navigation />
       <main>
-        <div id = 'content'>
-          <Outlet />
+        <div>
+          <Outlet/>
         </div>
       </main>
-      <Navigation></Navigation>
     </>
   );
 };

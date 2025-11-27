@@ -1,11 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import MainPage from './pages/main';
-import Navigation from './features/nav';
-import HomePage from './pages/recepiesPage';
-import RecipePage from './pages/receiptPage';
+import MainPage from './pages/MainPage';
+import Navigation from './components/nav';
+import HomePage from './pages/RecepiesPage';
+import RecipePage from './pages/ReceiptPage';
 import ProtectedRoute from './ProtectedRoute';
-import Login from './pages/Login';
+import Login from './pages/LoginPage';
 import { useSelector } from 'react-redux';
 import { store } from './store/store';
 import { finishLoading } from './store/authSlice';

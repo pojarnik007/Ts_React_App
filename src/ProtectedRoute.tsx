@@ -1,14 +1,16 @@
+import { RootState } from "@reduxjs/toolkit/query";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { useAppSelector } from "./store/hooks";
 
 interface ProtectedProps {
   children: ReactNode;
 }
 
 export default function ProtectedRoute({ children }: ProtectedProps) {
-  const token = useSelector((state: any) => state.auth.token);
-  const loading = useSelector((state: any) => state.auth.loading);
+  const token = useAppSelector((state) => state.auth.token);
+  const loading = useAppSelector((state) => state.auth.loading);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
