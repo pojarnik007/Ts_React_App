@@ -37,5 +37,33 @@ export interface LoginResponse {
   lastName: string;
   gender: string;
   image: string;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface IRecipesQueryArgs {
+  searchTerm?: string;
+  limit: number;
+  skip: number;
+  cuisine?: string;
+  mealType?: string;
+}
+
+export interface IGetRecipesArgs {
+  limit: number;
+  skip: number;
+  sortBy?: string;    
+  order?: 'asc' | 'desc';
+}
+
+export interface ISearchRecipesArgs {
+  searchTerm: string;
+  limit: number;
+  skip: number;
+}
+
+export interface IGetRecipesByTagArgs {
+  tag: string; 
+  limit: number;
+  skip: number;
 }
