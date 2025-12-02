@@ -3,10 +3,16 @@ import { Link } from 'react-router-dom';
 import { 
   Container, Grid, Card, CardMedia, CardContent, Typography, CardActions, Button, 
   Chip, CircularProgress, Box, TextField, Paper, Pagination,
-  FormControl, InputLabel, Select, MenuItem 
+  FormControl, InputLabel, Select, MenuItem, SelectChangeEvent
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { useGetRecipesQuery, useGetAllRecipesForCategoriesQuery } from '../services/recepies'; 
+
+import { 
+  useGetRecipesQuery, 
+  useSearchRecipesQuery, 
+  useGetRecipesByTagQuery,
+  useGetAllRecipesForCategoriesQuery 
+} from '../services/recepies'; 
 
 const PAGE_SIZE = 9; 
 
@@ -15,6 +21,8 @@ const RecepiesPage = () => {
   const [cuisineFilter, setCuisineFilter] = useState('All'); 
   const [mealTypeFilter, setMealTypeFilter] = useState('All'); 
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState('');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
   const skip = (currentPage - 1) * PAGE_SIZE;
 
@@ -32,14 +40,39 @@ const RecepiesPage = () => {
     return Array.from(mealTypes).sort();
   }, [categoriesData]);
 
-  const { data, isLoading, isFetching } = useGetRecipesQuery({
-    searchTerm: searchQuery,
-    limit: PAGE_SIZE,
-    skip: skip,
-    cuisine: cuisineFilter,
-    mealType: mealTypeFilter,
-  });
 
+  const isSearchMode = searchQuery.length > 0;
+  const isTagMode = !isSearchMode && (cuisineFilter !== 'All' || mealTypeFilter !== 'All');
+  const isDefaultMode = !isSearchMode && !isTagMode;
+  const activeTag = cuisineFilter !== 'All' ? cuisineFilter : mealTypeFilter;
+
+  const { 
+    data: searchData, 
+    isFetching: isSearchFetching 
+  } = useSearchRecipesQuery(
+    { searchTerm: searchQuery, limit: PAGE_SIZE, skip }, 
+    { skip: !isSearchMode }
+  );
+
+  const { 
+    data: tagData, 
+    isFetching: isTagFetching 
+  } = useGetRecipesByTagQuery(
+    { tag: activeTag, limit: PAGE_SIZE, skip }, 
+    { skip: !isTagMode }
+  );
+
+  const { 
+    data: defaultData, 
+    isFetching: isDefaultFetching 
+  } = useGetRecipesQuery(
+    { limit: PAGE_SIZE, skip, sortBy, order }, 
+    { skip: !isDefaultMode }
+  );
+
+  const data = isSearchMode ? searchData : isTagMode ? tagData : defaultData;
+  const isFetching = isSearchFetching || isTagFetching || isDefaultFetching;
+  
   const totalRecipes = data?.total || 0;
   const totalPages = Math.ceil(totalRecipes / PAGE_SIZE);
 
@@ -55,28 +88,36 @@ const RecepiesPage = () => {
     setCurrentPage(1);
   };
 
-  const handleFilterChange = (setter: React.Dispatch<React.SetStateAction<string>>, otherSetter: React.Dispatch<React.SetStateAction<string>>) => (event: any) => {
+  const handleFilterChange = (setter: React.Dispatch<React.SetStateAction<string>>, otherSetter: React.Dispatch<React.SetStateAction<string>>) => (event: SelectChangeEvent) => {
     setter(event.target.value);
-    setSearchQuery(''); 
-
+    setSearchQuery('');
+    
     if (event.target.value !== 'All') {
         otherSetter('All');
     }
-    
     setCurrentPage(1);
   };
 
+  const handleSortChange = (event: SelectChangeEvent) => {
+    setSortBy(event.target.value);
+    setCurrentPage(1);
+  };
 
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
-    );
+  const handleOrderChange = (event: SelectChangeEvent) => {
+    setOrder(event.target.value as 'asc' | 'desc');
+    setCurrentPage(1);
+  };
+
+  if (!data && isFetching) {
+     return (
+       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+         <CircularProgress />
+       </Box>
+     );
   }
-  
+
   const loadingIndicator = isFetching && (
-    <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.7)', zIndex: 1 }}>
+    <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.7)', zIndex: 2 }}>
       <CircularProgress />
     </Box>
   );
@@ -87,10 +128,9 @@ const RecepiesPage = () => {
         Рецепты
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 4, backgroundColor: '#fafafaff', position: 'relative' }} elevation={1}>
+      <Paper sx={{ p: 3, mb: 4, backgroundColor: '#fafafaff' }} elevation={1}>
         <Grid container spacing={2} alignItems="center">
-          
-          <Grid size = {{xs:6, md:6}}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField
               fullWidth
               label="Поиск рецепта"
@@ -98,14 +138,11 @@ const RecepiesPage = () => {
               value={searchQuery}
               onChange={handleSearchChange}
               InputProps={{
-                startAdornment: (
-                  <SearchIcon sx={{ color: 'action.active', mr: 1 }} />
-                ),
+                startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
               }}
             />
           </Grid>
-
-          <Grid size={{ xs: 6, md: 3 }}>
+          <Grid size={{ xs: 6, md: 2 }}>
             <FormControl fullWidth>
               <InputLabel>Кухня</InputLabel>
               <Select
@@ -113,15 +150,14 @@ const RecepiesPage = () => {
                 label="Кухня"
                 onChange={handleFilterChange(setCuisineFilter, setMealTypeFilter)}
               >
-                <MenuItem value="All">Все кухни</MenuItem>
+                <MenuItem value="All">Все</MenuItem>
                 {allCuisines.map((c) => (
                   <MenuItem key={c} value={c}>{c}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-
-          <Grid size={{ xs: 6, md: 3 }}>
+          <Grid size={{ xs: 6, md: 2 }}>
             <FormControl fullWidth>
               <InputLabel>Тип Блюда</InputLabel>
               <Select
@@ -129,10 +165,39 @@ const RecepiesPage = () => {
                 label="Тип Блюда"
                 onChange={handleFilterChange(setMealTypeFilter, setCuisineFilter)}
               >
-                <MenuItem value="All">Любое</MenuItem>
+                <MenuItem value="All">Все</MenuItem>
                 {allMealTypes.map((m) => (
                   <MenuItem key={m} value={m}>{m}</MenuItem>
                 ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 6, md: 2 }}>
+            <FormControl fullWidth disabled={!isDefaultMode}>
+              <InputLabel>Сортировка</InputLabel>
+              <Select
+                value={sortBy}
+                label="Сортировка"
+                onChange={handleSortChange}
+              >
+                <MenuItem value=""><em>Нет</em></MenuItem>
+                <MenuItem value="name">Название</MenuItem>
+                <MenuItem value="rating">Рейтинг</MenuItem>
+                <MenuItem value="caloriesPerServing">Калории</MenuItem>
+                <MenuItem value="difficulty">Сложность</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+           <Grid size={{ xs: 6, md: 2 }}>
+            <FormControl fullWidth disabled={!sortBy || !isDefaultMode}>
+              <InputLabel>Порядок</InputLabel>
+              <Select
+                value={order}
+                label="Порядок"
+                onChange={handleOrderChange}
+              >
+                <MenuItem value="asc">↑ Возр.</MenuItem>
+                <MenuItem value="desc">↓ Убыв.</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -140,17 +205,23 @@ const RecepiesPage = () => {
         </Grid>
       </Paper>
       
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: 'relative', minHeight: '200px' }}>
         {loadingIndicator}
 
         <Grid container spacing={4}>
           {data?.recipes && data.recipes.length > 0 ? (
             data.recipes.map((recipe: any) => (
-              <Grid key={recipe.id} size = {{xs:12, sm:6, md:4}}> 
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Grid key={recipe.id} size={{ xs: 12, sm: 6, md: 4 }}> 
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', transition: '0.3s', '&:hover': { boxShadow: 6 } }}>
                   <CardMedia component="img" height="200" image={recipe.image} alt={recipe.name} />
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">{recipe.name}</Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="start">
+                        <Typography gutterBottom variant="h6" component="h2" sx={{ lineHeight: 1.2 }}>
+                            {recipe.name}
+                        </Typography>
+                        <Chip label={recipe.rating} icon={<span>★</span>} size="small" color="primary" variant="outlined" />
+                    </Box>
+                    
                     <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                       <Chip label={recipe.difficulty} color={recipe.difficulty === 'Easy' ? 'success' : 'warning'} size="small" />
                       <Chip label={recipe.cuisine} variant="outlined" size="small" />
@@ -160,15 +231,17 @@ const RecepiesPage = () => {
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small" component={Link} to={`/recipe/${recipe.id}`}>Подробнее</Button>
+                    <Button size="small" component={Link} to={`/recipe/${recipe.id}`} fullWidth variant="contained">Подробнее</Button>
                   </CardActions>
                 </Card>
               </Grid>
             ))
           ) : (
-            <Typography variant="h6" sx={{ mt: 4, width: '100%', textAlign: 'center' }}>
-              Рецепты не найдены
-            </Typography>
+            !isFetching && (
+                <Typography variant="h6" sx={{ mt: 4, width: '100%', textAlign: 'center', color: 'text.secondary' }}>
+                Рецепты не найдены
+                </Typography>
+            )
           )}
         </Grid>
       </Box>

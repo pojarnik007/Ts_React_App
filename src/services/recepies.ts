@@ -1,23 +1,33 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { IRecipesResponse, IRecipe, IRecipesQueryArgs } from './types'; 
+import { IRecipesResponse, IRecipe, ISearchRecipesArgs, IGetRecipesArgs, IGetRecipesByTagArgs } from './types'; 
 
 export const recipesApi = createApi({
   reducerPath: 'recipesApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://dummyjson.com/' }),
   endpoints: (builder) => ({
-    
-    getRecipes: builder.query<IRecipesResponse, IRecipesQueryArgs>({
-      query: ({ searchTerm, limit, skip, cuisine, mealType }) => {
-        if (searchTerm) {
-          return `recipes/search?q=${searchTerm}&limit=${limit}&skip=${skip}`;
+
+    getRecipes: builder.query<IRecipesResponse, IGetRecipesArgs>({
+      query: ({ limit, skip, sortBy, order }) => {
+
+        let url = `recipes?limit=${limit}&skip=${skip}`;
+
+        if (sortBy && order) {
+          url += `&sortBy=${sortBy}&order=${order}`;
         }
-        if (cuisine && cuisine !== 'All') {
-            return `recipes/tag/${cuisine}?limit=${limit}&skip=${skip}`;
-        }
-        if (mealType && mealType !== 'All') {
-            return `recipes/tag/${mealType}?limit=${limit}&skip=${skip}`;
-        }
-        return `recipes?limit=${limit}&skip=${skip}`;
+        
+        return url;
+      },
+    }),
+
+    searchRecipes: builder.query<IRecipesResponse, ISearchRecipesArgs>({
+      query: ({ searchTerm, limit, skip }) => {
+        return `recipes/search?q=${searchTerm}&limit=${limit}&skip=${skip}`;
+      },
+    }),
+
+    getRecipesByTag: builder.query<IRecipesResponse, IGetRecipesByTagArgs>({
+      query: ({ tag, limit, skip }) => {
+        return `recipes/tag/${tag}?limit=${limit}&skip=${skip}`;
       },
     }),
 
@@ -35,6 +45,8 @@ export const recipesApi = createApi({
 
 export const { 
   useGetRecipesQuery,
+  useSearchRecipesQuery,
+  useGetRecipesByTagQuery,
   useGetRecipeByIdQuery,
   useGetAllRecipesForCategoriesQuery 
 } = recipesApi;
